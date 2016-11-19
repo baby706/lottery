@@ -1,0 +1,99 @@
+/*************************************************************************
+	> File Name: src/main.c
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: 
+	> Created Time: 2016年08月12日 星期五 11时40分34秒
+ ************************************************************************/
+
+#include "menu.h"
+#include "userBottomFunction.h"
+#include "userLogicFunction.h"
+#include "freePoint.h"
+#include "lottery.h"
+#include "purchase.h"
+#include "color.h"
+#include "base.h"
+
+void logo(void)
+{
+	int j = 5;
+	while(j--)
+	{
+	printf("%d\n",j);
+	int i = 0;
+	for( i = 0;i<6;i++)
+	{
+		system("clear");
+		YELLOW;
+		printf("   **************************************  欢迎使用  ********************************************\n\n\n");
+		END;
+		RED;
+		printf("\t\t\t\t大富翁彩票管理系统，成就你的百万富翁梦！\n\n");
+		END;
+		//printf("\n\n\n*****************************************************************************\n");
+		FILE* fp2 = fopen("logo.txt","r");
+		if( fp2 != NULL)
+		{	
+			switch(i)
+			{
+				case 0:
+					RED;
+					break;
+				case 1:
+					GREEN;
+					break;
+				case 2:
+					BLUE;
+					break;
+				case 3:
+					YELLOW;
+					break;
+				case 4:
+					PURPLE;
+					break;
+				case 5:
+					DEEPGREEN;
+					break;
+			}
+			while( !feof(fp2))
+				printf("%c",fgetc(fp2));
+		}
+		printf("\b");
+		END;
+		fclose(fp2);
+		usleep(200000);
+	}
+	}
+	END;
+	return ;
+}
+	
+
+
+
+int main(void)
+{	
+	logo();
+	struct userLink* userHead = (struct userLink*)calloc(1,sizeof(struct userLink));   //创建头节点,并且默认将next初始化为了NULL
+	struct lotteryLink* lotteryHead = (struct lotteryLink*)calloc(1,sizeof(struct lotteryLink));    //创建彩票发行头节点
+	struct purchaseLink* purchaseHead = (struct purchaseLink*)calloc(1,sizeof(struct purchaseLink));    //创建购买彩票链表头节点
+	lotteryHead->data.id = 2016000;
+	lotteryHead->data.status = 1;
+	purchaseHead->next = NULL;
+	
+	loadLottery(lotteryHead);
+	loadUser(userHead);    //加载文件
+	
+	menuMain(userHead,lotteryHead,purchaseHead);    //调用菜单
+	
+	saveUser(userHead);
+	saveLottery(lotteryHead);
+	//savePurchase(purchaseHead);
+	
+	freeUserPoint(userHead);    //释放用户链表
+	freeLotteryPoint(lotteryHead);
+	freePurchasePoint(purchaseHead);
+	return 0;
+
+}

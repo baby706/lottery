@@ -1,0 +1,153 @@
+#include "base.h"
+#include "issue.h"
+#include "ssq.h"
+#include "creat_time.h"
+
+//遍历打印
+void printf_lottery(struct lotteryLink* p)
+{
+	if(p == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	p = p->next;//跳过头节点
+	while(p != NULL)//
+	{
+		printf("发行期数 %d\t",p->data.id);
+		for(int i = 0;i<7;i++)
+		{
+			printf("%d ",(p->data.number)[i]);
+		}
+		printf("发行时间:%s\t 奖池:%.2f",p->data.issue_time,p->data.jackpot);
+		printf("\n");
+		p = p->next;
+	}
+	printf("\n");
+}
+
+//遍历释放
+void free_lottery(struct lotteryLink *p)
+{
+	if(p == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	while(p != NULL)
+	{
+		struct lotteryLink* save = p->next;
+		free(p);
+		p = save;//指针后移
+	}
+	p = NULL;
+}
+
+//创建节点
+struct lotteryLink *create_node_lottery(struct lottery data)//创建一个新的节点用来保存输入的信息
+{
+	struct lotteryLink *new = calloc(1,sizeof(struct lotteryLink));
+	new -> data = data;     //将数据存入新节点的值域
+	new -> next = NULL;    //将址域置空
+	return new;
+}
+
+//向后插入
+void insert_after_lottery(struct lotteryLink *p,struct lottery data)
+{
+	if(p == NULL)
+	{
+		printf("p为空\n");
+		return ;
+	}
+	while(p->next != NULL)
+	{
+		p = p->next;
+	}
+//	struct lotteryLink *save = p->next;
+	struct lotteryLink *new = create_node_lottery(data);
+	p->next = new;
+//	new->next = save;
+}
+
+//发行彩票
+void issue_lottery(struct lotteryLink *p)
+{
+	if(p == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	struct lottery data;
+	while(p->next != NULL)
+	{
+		p = p->next;
+	}
+	data.id = p->data.id + 1;
+	for(int i = 0;i<7;i++)
+	{
+		(data.number)[i] = num()[i];	
+	}
+	p->data.jackpot = 10000000;
+	strcpy(p->data.issue_time,creat_time());
+	insert_after_lottery(p, data);
+	printf("彩票发行成功！\n");
+}
+
+
+void load_lottery(struct lotteryLink *p)
+{
+	if(p == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	FILE* fp = fopen("lottery.data","r");
+	if(fp == NULL)
+	{
+		printf("文件不存在\n");
+		return ;
+	}
+	while(1)
+	{
+		struct lottery data;
+		int res = fread(&data,sizeof(struct lottery),1,fp);
+		if(res < 1)
+		{
+			break;
+		}
+		insert_after_lottery(p,data);
+	}
+	fclose(fp);
+}
+//保存
+void save_lottery(struct lotteryLink* p)
+{
+	if(p == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	FILE* fp = fopen("lottery.data","w");
+	p = p->next;
+	while(p!= NULL)
+	{
+		fwrite(&p->data,sizeof(struct lottery),1,fp);
+		p = p->next;
+	}
+	fclose(fp);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

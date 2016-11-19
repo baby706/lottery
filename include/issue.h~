@@ -1,0 +1,32 @@
+/*************************************************************************
+	> File Name: include/issue.h
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: 
+	> Created Time: Sun 07 Aug 2016 03:52:52 PM CST
+ ************************************************************************/
+#ifndef ISSUE_H_
+#define ISSUE_H_
+struct lottery
+{
+	char name[20];
+	int id ;              //期数
+	int number[7];           //开奖号码
+	char issue_time[40];     //发行时间
+	float jackpot ;//奖池
+};
+
+struct lotteryLink
+{
+	struct lottery data;
+	struct lotteryLink *next;
+};
+
+void printf_lottery(struct lotteryLink *p);
+void free_lottery(struct lotteryLink *p);
+void insert_after_lottery(struct lotteryLink *p,struct lottery data);
+void issue_lottery(struct lotteryLink *p);
+void load_lottery(struct lotteryLink *p);
+void save_lottery(struct lotteryLink* p);
+
+#endif

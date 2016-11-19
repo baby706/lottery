@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define RED "\033[0;32;31m"
+#define BLUE "\033[0;32;34m"
+#define END "\033[0m"
+
+int *num()
+{
+	
+	int *p = calloc(1,sizeof(int)*7);
+	int red[6]; /* 1-33 */
+	int blue; /* 1-16 */
+	int i,j;
+	int tmp;
+	srand( (unsigned)time(NULL) );
+
+	i = 0;
+	while(i<6)
+	{
+		tmp = (1.0 * rand() /RAND_MAX) * 33 + 1;
+		for(j=0; j<i;j++)
+		{
+			if(red[j] == tmp)
+			{
+				break;
+			}
+		}
+		if(j==i)
+		{
+			red[i] = tmp;
+			i++;
+		}
+	}
+	red[6] = (1.0 * rand() /RAND_MAX) * 16 + 1;
+
+	for(i = 0; i<7; i++)
+	{	
+		p[i] = 	red[i];
+	}
+	
+	return p;
+} 

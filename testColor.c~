@@ -1,0 +1,9 @@
+#include "base.h"
+#include "color.h"
+
+int main(void)
+{
+	RED printf("liangbo\n"); END
+	
+	return 0;
+}

@@ -1,0 +1,286 @@
+#include "base.h"
+
+#include "userBottomFunction.h"
+#include "lottery.h"
+#include "createBall.h"
+#include "color.h"
+#include "createTime.h"
+#include "purchase.h"
+
+
+
+void purchaseLottery(struct userLink* pre,struct userLink* userHead,struct lotteryLink* lotteryHead,struct purchaseLink* purchaseHead)
+{
+	struct purchase data;
+	if(purchaseHead == NULL)
+	{
+		printf("头节点为空!\n");
+		usleep(1000000);
+		return ;
+	}
+	while(lotteryHead->next != NULL)     //找到彩票链表的最后一条记录
+	{
+		lotteryHead = lotteryHead->next;
+	}
+	if(lotteryHead->data.id == 2016000)
+	{	
+		RED;
+		printf("暂未发行彩票!\n");
+		END;
+		usleep(1000000);
+		return ;
+	}
+	else
+	{
+		int i = 0;
+		if(lotteryHead->data.status)
+		{
+			RED;
+			printf("对不起，本期已开奖!\n");
+			END;
+			usleep(1000000);
+			return ;
+		}
+		else
+		{
+			
+			printf("第%d期彩票已发行，单注%.2f元，现可购买。\n",lotteryHead->data.id,lotteryHead->data.price);
+			printf("请输入您要购买的红色球号码(1-33):");
+			RED;
+			for( i = 0;i<6;i++)
+			{
+				scanf("%d",&data.number[i]);
+				if(data.number[i]<0 || data.number[i]>33)
+				{
+					RED;
+					printf("输入错误，请重新输入!\n");
+					END;
+					usleep(1000000);
+					return ;
+				}
+			
+				for(int j = i-1;j >= 0;j--)
+				{
+					if(data.number[i] == data.number[j])
+					{	
+						RED;
+						printf("您输入的数字里面有重复，请重新输入！\n");
+						END;
+						usleep(1000000);
+						return ;
+					}
+				}
+			}
+			END;
+			
+			printf("请输入您要购买的蓝色球号码(1-16):");
+			BLUE;
+			scanf("%d",&data.number[6]);
+			END;
+			if(data.number[6]<1 || data.number[6]>16)
+			{
+				RED;
+				printf("输入错误！");
+				END;
+				usleep(1000000);
+				return ;
+			}
+		}
+		END;
+		BubbleSortASC(data.number,6);
+		printf("请输入要购买的注数(最多5注):");
+		while(1)
+		{
+			scanf("%d",&data.unit);
+			if(data.unit<0 || data.unit>5)
+			{
+				RED;
+				printf("输入错误，请重新输入!\n");
+				END;
+				usleep(1000000);
+			}
+			else
+			{
+				lotteryHead->data.count = lotteryHead->data.count + data.unit;
+				break;
+			}
+		}
+		printf("请确认您要购买的彩票:\n红色球:");
+		i = 0;
+		RED;
+		while(i<6)
+		{
+			printf("%d ",data.number[i]);
+			i++;
+		}
+		END;
+		printf("\n蓝色球:\033[34;1m%d\033[0m",data.number[6]);
+		printf("\n购买的注数:%d",data.unit);
+		printf("\n总金额%.2f元\n",(data.unit)*(lotteryHead->data.price));
+		data.id = lotteryHead->data.id;
+		data.money = (data.unit)*(lotteryHead->data.price);
+		strcpy(data.purchaseTime,createTime());
+		pre->next->data.balance = pre->next->data.balance - data.money;
+		lotteryHead->data.jackpot = lotteryHead->data.jackpot + data.money;
+		data.status = 0;
+		//strcpy(data.admin,lotteryHead->data.admin);
+		
+		printf("1.确认购买    2.重新选号     3.返回\n");
+		int choose = -1;
+		scanf("%d",&choose);
+		switch(choose)
+		{
+			case 1:
+				insertAfterPurchase(purchaseHead,data);
+				break;
+				
+			case 2:
+				return ;
+			case 3:
+				return ;
+		}
+		RED;
+		printf("彩票购买成功!\n");
+		END;
+		saveUser(userHead);
+		savePurchase(pre,purchaseHead);	
+		saveLottery(lotteryHead);
+		while(getchar()!='\n');
+		printf("返回请按\033[31;1mENTER\033[0m键\n");
+		while(getchar() == '\n')
+		{
+			return ;
+		}
+		
+	}
+}
+
+
+//底层函数
+//创建节点，将新的数据块存入purchaseLink结构体
+struct purchaseLink* createPurchaseNode(struct purchase data)
+{
+	struct purchaseLink* new = (struct purchaseLink*)calloc(1,sizeof(struct purchaseLink));
+	new->data = data;
+	new->next = NULL;
+	return new;
+}
+
+//后向插入，将创建的节点插入purchaseLink链表尾部
+void insertAfterPurchase(struct purchaseLink* purchaseHead,struct purchase data)
+{
+	if(purchaseHead == NULL)
+	{
+		printf("头节点为空!\n");
+		return ;
+	}
+	while(purchaseHead->next != NULL)
+	{
+		purchaseHead = purchaseHead->next;
+	}
+	struct purchaseLink* new = createPurchaseNode(data);
+	purchaseHead->next = new;
+}
+
+//查询函数
+/*struct purchaseLink* selectPurchaseLink(struct purchaseLink* purchaseHead,char* id)
+{
+	if(purchaseHead == NULL)
+	{
+		printf("头节点为空!\n");
+		return NULL;
+	}
+	
+	struct purchaseLink* pre = purchaseHead;   //保留当前查询到的id的上一个节点
+	purchaseHead = purchaseHead->next;   //跳过头节点
+	while(purchaseHead != NULL)
+	{
+		if(strcmp(purchaseHead->data.id,id) == 0)
+		{
+			return pre;
+		}
+		pre = purchaseHead;
+		purchaseHead = purchaseHead->next;
+	}
+	return NULL;
+}*/
+
+//加载文件
+void loadPurchase(struct userLink* pre,struct purchaseLink* purchaseHead)
+{
+	if(purchaseHead == NULL)
+	{
+		printf("头节点为空!\n");
+		return ;
+	}
+	char path[40] = "data/purchase/";
+	FILE* fp = fopen(strcat(path,pre->next->data.id),"r");
+	if(fp == NULL)
+	{
+		printf("加载文件中...!\n");
+		return ;
+	}
+	struct purchase data;  //创建一个临时变量用来保存从文件中读取的数据
+	while(1)
+	{
+		int res = fread(&data,sizeof(struct purchase),1,fp);  //将数据存到临时变量中，并返回读取的字节数
+		if(res<1)
+		{
+			break;
+		}
+		insertAfterPurchase(purchaseHead,data);
+		
+	}
+	fclose(fp);
+	fp == NULL ;
+}
+
+//保存文件
+void savePurchase(struct userLink* pre,struct purchaseLink* purchaseHead)
+{
+	if(purchaseHead == NULL)
+	{
+		printf("头节点为空!\n");
+		return ;
+	}
+	char path[40] = "data/purchase/";
+	FILE* fp = fopen(strcat(path,pre->next->data.id),"w");
+	if(fp == NULL)
+	{
+		printf("写入文件失败!\n");
+		return ;
+	}
+	purchaseHead = purchaseHead->next;   //跳过头节点
+	while(purchaseHead != NULL)
+	{
+		fwrite(&purchaseHead->data,sizeof(struct purchase),1,fp);
+		purchaseHead = purchaseHead->next;
+	}
+	fclose(fp);
+	fp == NULL;
+}
+
+void printPurchaseLink(struct purchaseLink* purchaseHead)
+{
+	if(purchaseHead == NULL)
+	{	
+		printf("头节点为空!\n");
+		return ;
+	}
+	purchaseHead = purchaseHead -> next;
+	while(purchaseHead != NULL)
+	{
+		printf("购买期数:%d\n",purchaseHead->data.id);
+		purchaseHead = purchaseHead->next;
+	}
+}
+
+void deletePurchaseLink(struct purchaseLink* pre)
+{
+	struct purchaseLink* save = pre->next;
+	pre->next = save->next;
+	free(save);
+	save = NULL;
+
+}
+

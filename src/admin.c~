@@ -1,0 +1,23 @@
+/*************************************************************************
+	> File Name: src/admin.c
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: 
+	> Created Time: Sun 07 Aug 2016 03:34:08 PM CST
+ ************************************************************************/
+
+#include"base.h"
+#include"user.h"
+
+void charge(struct userLink *p)
+{	
+	char name[20];
+	printf("请输入需要充值的用户名:\n");
+	scanf("%s",name);
+	struct userLink *pre = select_list(p,name);
+	printf("请输入需要充值的金额:");
+	float money;
+	scanf("%f",&money);
+	pre->next->data.balance = pre->next->data.balance + money;
+	printf("充值成功!");
+}

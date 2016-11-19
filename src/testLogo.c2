@@ -1,0 +1,57 @@
+#include <unistd.h>
+#include "base.h"
+#include "color.h"
+
+void logo(void)
+{
+	int j = 5;
+	while(j--)
+	{
+	printf("%d\n",j);
+	int i = 0;
+	for( i = 0;i<6;i++)
+	{
+		system("clear");
+		YELLOW;
+		printf("   **************************************  欢迎使用  ********************************************\n\n\n");
+		END;
+		RED;
+		printf("\t\t\t\t大富翁彩票管理系统，成就你的百万富翁梦！\n\n");
+		END;
+		//printf("\n\n\n*****************************************************************************\n");
+		FILE* fp2 = fopen("../..logo.txt","r+");
+		if( fp2 != NULL)
+		{	
+			switch(i)
+			{
+				case 0:
+					RED;
+					break;
+				case 1:
+					GREEN;
+					break;
+				case 2:
+					BLUE;
+					break;
+				case 3:
+					YELLOW;
+					break;
+				case 4:
+					PURPLE;
+					break;
+				case 5:
+					DEEPGREEN;
+					break;
+			}
+			while( !feof(fp2))
+				printf("%c",fgetc(fp2));
+		}
+		printf("\b");
+		END;
+		fclose(fp2);
+		usleep(200000);
+	}
+	}
+	END;
+	return ;
+}

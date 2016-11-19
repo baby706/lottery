@@ -1,0 +1,16 @@
+#ifndef MENU1_H_
+#define MENU1_H_
+
+#include"issue.h"
+#include"user.h"
+#include"purchase.h"
+
+void menu1(struct userLink *user_head, struct lotteryLink *lottery_head, struct purchaseLink* purchase_head);
+void menu2(struct userLink *user_head, char *name,struct purchaseLink * purchase_head,struct lotteryLink *lottery_head);
+int menu3(struct userLink *user_head,struct lotteryLink *lottery_head,struct purchaseLink *purchase_head);
+void menu7(struct lotteryLink *lottery_head);
+void menu4(struct userLink *user_head);
+void menu5(struct lotteryLink *lottery_head,struct purchaseLink *purchase_head);
+void menu6(struct userLink *user_head);
+
+#endif

@@ -1,0 +1,827 @@
+/*************************************************************************
+	> File Name: src/menu.c
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: The menu interface of lottery project
+	> Created Time: 2016年08月12日 星期五 10时57分47秒
+ ************************************************************************/
+#include "base.h"
+#include "userBottomFunction.h"
+#include "userLogicFunction.h"
+#include "purchase.h"
+#include "lottery.h"
+#include "color.h"
+#include "menu.h"
+#include <unistd.h>
+#include <time.h>
+
+
+//主菜单
+void menuMain(struct userLink* userHead,struct lotteryLink* lotteryHead,struct purchaseLink* purchaseHead)    
+{
+	while(1)
+	{	
+		int choose = -1;
+		system("clear");
+		YELLOW;
+		printf("\t\t\t\t\t大富翁彩票管理系统  v1.0  \n\n");
+		END;
+		printf("\t\t\t\t*****************************************\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*\t\t1.登陆\t\t\t*\n");
+		printf("\t\t\t\t*\t\t2.注册\t\t\t*\n");
+		printf("\t\t\t\t*");
+		RED;
+		printf("\t\t3.退出");
+		END;
+		printf("\t\t\t*\n");
+		END;
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*****************************************\n\n");
+		printf("\t\t\t\t请选择:");
+		scanf("%d",&choose);
+		while(getchar() != '\n');   //吸收输入选择后的回车
+		switch(choose)
+		{
+			case 1:
+			    loginUser(userHead,lotteryHead,purchaseHead);            //登陆函数,成功后调用menu2，失败退出登陆函数
+				break;
+			
+			case 2:
+				registerUser(userHead);          //注册函数
+				saveUser(userHead);
+				break;
+			/*case 3:
+				printUserLink(userHead);
+				break;*/
+			
+			case 3:
+					RED;
+					printf("\t\t\t\t您确认要退出吗？  [Y/N]   ");
+					
+					char confirm = getchar();
+					if(confirm == 'Y' || confirm == 'y')
+					{	
+						END;
+						system("clear");
+						return ;
+					}	
+			
+			default:
+				RED;
+				printf("输入错误，请重新输入！\n");
+				END;
+				usleep(1000000);
+				break;
+		}
+	}
+}
+
+//用户登陆成功二级菜单
+void menu2(struct userLink* pre,struct userLink* userHead,struct lotteryLink* lotteryHead,struct purchaseLink* purchaseHead)
+{
+	while(1)
+	{
+		system("clear");
+		int choose = -1;
+		printf("\t\t\t\t*****************************************\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*\t\t1.购买彩票\t\t*\n");
+		printf("\t\t\t\t*\t\t2.查询中奖\t\t*\n");
+		printf("\t\t\t\t*\t\t3.购买记录\t\t*\n");
+		printf("\t\t\t\t*\t\t4.个人中心\t\t*\n");
+		printf("\t\t\t\t*\t\t5.返回上级\t\t*\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*****************************************\n\n");
+		printf("\t\t\t\t请选择:");
+		scanf("%d",&choose);
+
+		while(getchar()!='\n');
+		switch(choose)
+		{
+			case 1:
+				purchaseLottery(pre,userHead,lotteryHead,purchaseHead);
+				break;
+			case 2:
+				checkLottery(pre,lotteryHead,purchaseHead);
+				savePurchase(pre,purchaseHead);
+				break;
+			case 3:
+				purchaseLotteryHistory(purchaseHead);
+				break;
+				
+			case 4:
+				system("clear");
+				printUser(pre);
+				printf("是否返回？ Y/N\n");
+				char confirm = getchar();
+				if(confirm == 'y' || confirm == 'Y')
+				break;
+			case 5:
+				return ;
+			default :
+				printf("输入错误，请重新输入！\n");
+				break;
+		}
+	}
+	
+}
+
+//个人中心-三级菜单
+void menu3(struct userLink* pre)
+{	while(1)
+	{	
+		
+		int choose = -1;
+		printf("\t\t\t\t*****************************************\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*\t\t1.余额充值\t\t*\n");
+		printf("\t\t\t\t*\t\t2.修改密码\t\t*\n");
+		printf("\t\t\t\t*\t\t3.用户注销\t\t*\n");
+		printf("\t\t\t\t*\t\t4.返回上级\t\t*\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*****************************************\n\n");
+		
+		printf("\t\t\t\t请选择:");
+		scanf("%d",&choose);
+		switch(choose)
+		{
+			case 1:
+				chargeUserBalance(pre);
+				break;
+			case 2:
+				changeUserPasswd(pre);
+				break;
+			case 3:
+				deleteUser(pre);
+				return ;
+			case 4:
+				return ;
+			default:
+				printf("输入错误，请重新输入!\n");
+				break;
+		}
+	}
+}
+
+
+//管理员登陆成功二级菜单
+void menuAdmin(struct userLink* userHead,struct lotteryLink* lotteryHead,struct purchaseLink* purchaseHead)
+{
+	//printf("the admin is succefully menu %d",lotteryHead->data.id);
+	
+	while(1)
+	{
+		system("clear");
+		int choose = -1;
+		printf("\t\t\t\t*****************************************\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*\t\t1.发行彩票\t\t*\n");
+		printf("\t\t\t\t*\t\t2.发行记录\t\t*\n");
+		printf("\t\t\t\t*\t\t3.用户信息\t\t*\n");
+		printf("\t\t\t\t*\t\t4.返回上级\t\t*\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*****************************************\n\n");
+		printf("\t\t\t\t请选择:");
+		scanf("%d",&choose);
+		switch(choose)
+		{
+			case 1:
+				issueLottery(lotteryHead);
+				saveLottery(lotteryHead);
+				break;
+			case 2:
+				printLotteryLink(lotteryHead);
+				break;
+			case 3:
+				checkUser(userHead,purchaseHead);
+				
+			case 4:
+				return ;
+			default:
+				printf("输入错误!\n");
+				break;
+		}
+		
+	}	
+}
+
+//查看购买记录
+void purchaseLotteryHistory(struct purchaseLink* purchaseHead)
+{
+	int status = -1;
+	if(purchaseHead == 0)
+	{
+		printf("头节点为空!\n");
+		return ;
+	}
+	purchaseHead = purchaseHead->next;
+	system("clear");
+	printf("以下是您目前的购买记录:\n\n");
+	while(purchaseHead != NULL)
+	{
+		printf("您购买了第%d期 ",purchaseHead->data.id);
+		DEEPGREEN
+		printf("%d",purchaseHead->data.unit);
+		END
+		printf("注,红球号码为:");
+		RED
+		for(int i = 0;i<6;i++)
+		{
+			printf("%d ",purchaseHead->data.number[i]);
+		}
+		BLUE
+		printf(",蓝球号码为:%d ",purchaseHead->data.number[6]);
+		END
+		printf("状态:");
+		status = purchaseHead->data.status;
+		switch(status)
+		{
+			case 1:
+				printf("一等奖\n");
+				break;
+			case 2:
+				printf("二等奖\n");
+				break;	
+			case 3:
+				printf("三等奖\n");
+				break;;	
+			case4:
+				printf("四等奖\n");
+				break;
+			case 5:
+				printf("五等奖\n");
+				break;
+			case 6:
+				printf("六等奖\n");
+				break;
+			case 7:
+				printf("未中奖\n");
+				break;
+			case 8:
+				printf("已过期\n");
+				break;
+			case 0:
+				printf("未查询\n");
+				break;	
+			default:
+				break;
+		
+		
+		
+		}
+		purchaseHead = purchaseHead->next;
+	}
+	printf("\n返回请按\033[31;1mENTER键\033[0m\n");
+	while(getchar() == '\n')
+	{
+		
+		return ;
+	}
+}
+
+//查询中奖
+void checkLottery(struct userLink* pre,struct lotteryLink *lotteryHead,struct purchaseLink *purchaseHead)
+{
+	int status = 0;     //未查询
+	float balance = 0;	//奖金
+	
+ 	if(purchaseHead -> next == NULL)  //只有头结点，暂没有购买彩票
+ 	{
+ 		RED;
+ 		printf("您还未购买彩票!\n");
+ 		END;
+ 		usleep(1000000);
+ 		return ;
+ 	}
+ 	
+
+	if(lotteryHead == NULL || purchaseHead == NULL)    //头结点为空
+	{
+		RED;
+		printf("头节点为空!\n");
+		END;
+		usleep(1000000);
+		return ;
+	}
+	
+	lotteryHead = lotteryHead -> next;      //跳过头结点
+	purchaseHead = purchaseHead -> next;
+	
+	while(lotteryHead -> next != NULL)      //跳转到最后一个节点
+	{
+		lotteryHead = lotteryHead ->next;
+	}
+	if(!lotteryHead -> data.status)
+	{
+			RED;
+			printf("抱歉，暂未开奖!\n");
+ 			END;
+			usleep(1000000);
+			return ;
+	}
+	else
+	{	
+		while(purchaseHead != NULL )     //已经到了最后的节点
+		{	
+			if(purchaseHead->data.id != lotteryHead->data.id)    //购买期数和发行彩票的最后一期不符合
+			{
+				if(purchaseHead -> next == NULL)  //达到了尾节点
+				{
+					
+						
+						RED;
+						printf("抱歉，已经过了开奖期,请及时关注开奖动态！\n");
+						END;
+						usleep(1000000);
+						status = 8;
+					
+						purchaseHead -> data.status = status;
+						return ;
+					
+				}
+				else
+				{
+					purchaseHead = purchaseHead -> next;
+					
+				}
+			}
+			else                                //购买的就是当期的彩票
+			{	
+				if(purchaseHead->data.status )    //已经进行了中奖查询
+				{
+					int choose = -1;
+					choose = purchaseHead->data.status;
+					switch(choose)
+					{
+						case 1:
+							RED;
+							printf("恭喜您中了%d注一等奖，单注奖金为5000000元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*5000000);
+							END;
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}					
+							break;
+						case 2:
+							RED;
+							printf("恭喜您中了%d注二等奖，单注奖金为300000元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*300000);
+							END;
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;
+						case 3:
+							RED;
+							printf("恭喜您中了%d注三等奖，单注奖金为3000元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*3000);
+							END;
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;
+						case 4:
+							RED;
+							printf("恭喜您中了%d注四等奖，单注奖金为200元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*200);
+							END;
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;	
+						case 5:
+							RED;
+							printf("恭喜您中了%d注五等奖，单注奖金为10元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*10);
+							END;
+						
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;	
+						case 6:
+							RED;
+							printf("恭喜您中了%d注六等奖，单注奖金为5元,总额为%d元,已打入您的账户中！\n",purchaseHead->data.unit,purchaseHead->data.unit*5);
+							END;
+							
+							//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;	
+						case 7:
+							RED;
+							printf("非常抱歉，暂未中奖！\n");
+							END;
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;	
+						case 8:
+							RED;
+							printf("非常抱歉，已过期,请及时关注开奖动态！\n");
+							END;
+							if(getchar() == '\n')
+							{
+								break ;
+							}
+							break;
+								
+					}
+					purchaseHead = purchaseHead->next;
+				}
+				else															//还没查询是否中奖
+				{	
+					YELLOW;
+					printf("您的中奖信息为:\n");
+					END;
+						while(purchaseHead != NULL)
+						{
+								int blue = 0,red = 0;
+								for(int i = 0;i<6;i++)
+								{
+									
+									for(int j = 0;j<6;j++)
+									{
+										if(lotteryHead->data.number[i] == purchaseHead->data.number[j])
+										{
+											red++;
+										}
+									}	
+								}
+								if(purchaseHead->data.number[6] == lotteryHead->data.number[6])
+								{	
+									blue = 1;
+								}
+								else
+								{
+									blue = 0;
+								}
+							
+								if(blue)       //如果蓝色球中了
+								{
+									
+									switch(red)
+									{
+										case 0:case 1:case 2:
+											RED;
+											printf("恭喜您中了%d注六等奖，单注奖金为5元,共%d元\n",purchaseHead->data.unit,5*purchaseHead->data.unit);
+											END;
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											status = 6;
+											balance = 5*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												break;
+											}
+										case 3:
+											
+											RED;
+											printf("恭喜您中了%d注五等奖，单注奖金为10元,共%d元\n",purchaseHead->data.unit,10*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 5;
+											balance = 10*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+										case 4:
+											
+											RED;
+											printf("恭喜您中了%d注四等奖，单注奖金为200元,共%d元\n",purchaseHead->data.unit,200*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 4;
+											balance = 200*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+										case 5:
+											
+											RED;
+											printf("恭喜您中了%d注三等奖，单注奖金为3000元,共%d元\n",purchaseHead->data.unit,3000*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 3;
+											balance = 3000*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+											break;
+											
+										case 6:
+											
+											RED;
+											printf("恭喜您中了%d注一等奖，单注奖金为5000000元,共%d元\n",purchaseHead->data.unit,5000000*purchaseHead->data.unit);
+											END;
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 1;
+											balance = 5000000*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+									}
+									purchaseHead -> data.status = status;
+									pre -> next -> data.balance = pre -> next -> data.balance + balance;
+									lotteryHead -> data.jackpot = lotteryHead -> data.jackpot - balance;
+									purchaseHead = purchaseHead -> next;
+								}
+			
+								else           //如果蓝色球没中
+								{
+									switch(red)
+									{
+										case 4:
+											
+											RED;
+											printf("恭喜您中了%d注五等奖，单注奖金为10元,共%d元\n",purchaseHead->data.unit,10*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 5;
+											balance = 10*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+										case 5:
+											
+											RED;
+											printf("恭喜您中了%d注四等奖，单注奖金为200元,共%d元\n",purchaseHead->data.unit,200*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 4;
+											balance = 200*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+										case 6:
+											
+											RED;
+											printf("恭喜您中了%d注二等奖，单注奖金为300000元,共%d元\n",purchaseHead->data.unit,300000*purchaseHead->data.unit);
+											END;
+											 
+											//printf("返回请按\033[31;1mENTER\033[0m键!\n");
+											
+											status = 2;
+											balance = 300000*purchaseHead->data.unit;
+											if(getchar() == '\n')
+											{
+												 break ;
+											}
+										default:
+											YELLOW;
+											printf("抱歉，这注您未中奖！\n");
+											END;
+											usleep(1000000);
+											status = 7;
+											break ;
+									}
+									purchaseHead -> data.status = status;
+									pre -> next -> data.balance = pre -> next -> data.balance + balance;
+									lotteryHead -> data.jackpot = lotteryHead -> data.jackpot - balance;
+									purchaseHead = purchaseHead -> next;
+								}
+								
+						}
+						RED;
+						printf("返回请按\033[31;1mENTER\033[0m键\n");
+						END;
+						while(getchar() == '\n')
+						{
+							return ;
+						}		
+				}
+			}
+			
+		}
+		RED;
+						printf("返回请按\033[31;1mENTER\033[0m键\n");
+						END;
+						while(getchar() == '\n')
+						{
+							return ;
+						}		
+		
+	}
+}
+	
+	
+	
+// 查看用户信息
+void checkUser(struct userLink* userHead,struct purchaseLink* purchaseHead)
+{   
+    printUserLink(userHead);
+	while(1)
+	{   system("clear");
+	    int choose = -1;
+		printf("\t\t\t\t*****************************************\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*\t\t1.按用户姓名查看\t*\n");
+		printf("\t\t\t\t*\t\t2.按余额区间查看\t*\n");
+		printf("\t\t\t\t*\t\t3.按用户名排序\t\t*\n");
+		printf("\t\t\t\t*\t\t4.按余额排序\t\t*\n");
+		printf("\t\t\t\t*\t\t5.返回上级\t\t*\n");
+		printf("\t\t\t\t*\t\t\t\t\t*\n");
+		printf("\t\t\t\t*****************************************\n\n");
+		printf("\t\t\t\t请选择:");
+		scanf("%d",&choose);
+		
+		
+		switch(choose)
+		{
+		    case 1:
+		        {   
+		            char id[20];
+		            printf("请输入要查看的用户名:");
+		            scanf("%s",id);
+		            checkName(userHead,id);
+		            break;
+		        }
+		    case 2:
+		        checkBalance(userHead);
+		        break;
+		    case 3:
+		    	sortByName(userHead);
+		    	printUserLink(userHead);
+		    	break;
+		    	
+		    case 4:
+		    	sortByBalance(userHead);
+		    	printUserLink(userHead);
+		    	break;
+		    case 5:
+		    	return ;
+		    default:
+		        printf("输入错误，请重新输入\n");
+		        break;
+		}
+	}
+}
+
+//按用户名查看信息
+void checkName(struct userLink* userHead,char id[])
+{
+    struct userLink* pre = selectUserLink(userHead,id);
+    printf("用户名:%s,余额: %.2f\n",pre->next->data.id,pre->next->data.balance);  
+    while(getchar() != '\n');
+    printf("\n返回请按\033[31;1mENTER\033[0m键\n");
+    while(getchar() == '\n')
+    {
+    	return ;
+    } 
+}
+
+//按余额区间查看信息
+void checkBalance(struct userLink* userHead)
+{   
+    float a,b;
+    printf("请输入余额区间:");
+    scanf("%f %f",&a,&b);
+    
+	if(userHead == NULL)
+	{	
+		printf("头节点为空!\n");
+		return ;
+	}
+	userHead = userHead -> next;  //跳过头节点
+	while(userHead != NULL)
+	{
+	    if(userHead->data.balance >= a && userHead->data.balance <= b)
+		{
+		    printf("用户名:%s    密码：***   余额:%.2f\n",userHead->data.id,userHead->data.balance);
+		}
+		userHead = userHead->next;
+	}
+	
+	while(getchar() != '\n');
+    printf("\n返回请按\033[31;1mENTER\033[0m键\n");
+    while(getchar() == '\n')
+    {
+    	return ;
+    } 
+     
+}
+
+void sortByBalance(struct userLink* userHead)
+{
+	struct userLink* head = userHead;
+
+	if(userHead == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	int length = 0;
+	userHead = userHead ->next;//头节点不做排序
+	while(userHead != NULL)
+	{
+		userHead = userHead->next;
+		length++;
+	}
+	for(int i = 0;i<length;i++)
+	{
+		userHead = head->next;
+		for(int j = 0;j<length-i-1;j++)
+		{
+			if(userHead->data.balance > userHead->next->data.balance)
+			{
+				struct user data = userHead->data;
+				userHead->data = userHead->next->data;
+				userHead->next->data = data;
+			}
+			userHead = userHead->next;
+		}
+	}
+	
+	
+}
+	
+	
+void sortByName(struct userLink* userHead)
+{
+	struct userLink* head = userHead;
+
+	if(userHead == NULL)
+	{
+		printf("头节点为空\n");
+		return ;
+	}
+	int length = 0;
+	userHead = userHead ->next;//头节点不做排序
+	while(userHead != NULL)
+	{
+		userHead = userHead->next;
+		length++;
+	}
+	for(int i = 0;i<length;i++)
+	{
+		userHead = head->next;
+		for(int j = 0;j<length-i-1;j++)
+		{
+			if( strcmp(userHead->data.id,userHead->next->data.id) > 0 )
+			{
+				struct user data = userHead->data;
+				userHead->data = userHead->next->data;
+				userHead->next->data = data;
+			}
+			userHead = userHead->next;
+		}
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

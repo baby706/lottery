@@ -1,0 +1,41 @@
+/*************************************************************************
+	> File Name: user.h
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: 
+	> Created Time: 2016年08月12日 星期五 15时15分23秒
+ ************************************************************************/
+#ifndef USER_H
+#define USER_H
+struct user
+{
+	char id[20];
+	char name[20];
+	float balance;
+	int level;
+	char passwd[20];
+};
+
+struct userLink
+{
+	struct user data;
+	struct userLink* next;
+	struct userLink* previous;
+};
+
+//创建节点
+struct userLink* creatUserNode(struct user data);  
+
+//后向插入
+void insertAfterUser(struct userLink* p,data);
+
+//加载文件
+void loadUser(struct userLink* p);
+
+//保存文件
+void saveUser(struct userLink* p);
+
+
+#endif 
+
+

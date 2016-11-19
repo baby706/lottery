@@ -1,0 +1,21 @@
+/*************************************************************************
+	> File Name: include/freePoint.h
+	> Author: Liang Bo
+	> Mail: cs-b@163.com 
+	> Function: 
+	> Created Time: 2016年08月13日 星期六 08时30分31秒
+ ************************************************************************/
+#ifndef FREEPOINT_H
+#define FREEPOINT_H
+
+#include "base.h"
+#include "lottery.h"
+#include "purchase.h"
+void freeUserPoint(struct userLink* userHead);
+
+void freeLotteryPoint(struct lotteryLink* lotteryHead);
+
+void freePurchasePoint(struct purchaseLink* purchaseHead);
+#endif 
+
+
